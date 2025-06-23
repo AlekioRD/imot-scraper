@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  imot-scraper:
+    build: .
+    container_name: imot-scraper
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - GOOGLE_SERVICE_ACCOUNT_JSON=${GOOGLE_SERVICE_ACCOUNT_JSON}
+      - GOOGLE_SHEET_NAME=${GOOGLE_SHEET_NAME:-Imot Data Extractor}
+      - BATCH_SIZE=${BATCH_SIZE:-20}
+      - SCHEDULE_HOURS=${SCHEDULE_HOURS:-6}
+      - PORT=3000
+      - PYTHONUNBUFFERED=1
+      - TZ=Europe/Sofia
+    volumes:
+      - logs:/app/logs
+      - screenshots:/app/screenshots
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+volumes:
+  logs:
+  screenshots:
